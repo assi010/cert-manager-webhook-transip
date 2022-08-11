@@ -5,8 +5,8 @@ certManager:
   serviceAccountName: cert-manager
 
 image:
-  repository: robbietjuh/cert-manager-webhook-transip
-  tag: latest
+  repository: assi010/cert-manager-webhook-transip
+  tag: 1.0
   privateRegistrySecretName: ""
   pullPolicy: IfNotPresent
 

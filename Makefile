@@ -1,8 +1,8 @@
 OS ?= $(shell go env GOOS)
 ARCH ?= $(shell go env GOARCH)
 
-IMAGE_NAME := "robbietjuh/cert-manager-webhook-transip"
-IMAGE_TAG := "latest"
+IMAGE_NAME := "assi010/cert-manager-webhook-transip"
+IMAGE_TAG := "1.0"
 
 OUT := $(shell pwd)/_out
 
