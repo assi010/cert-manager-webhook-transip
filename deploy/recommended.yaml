@@ -1,50 +1,20 @@
 ---
+# Source: transip-webhook/templates/rbac.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: transip-webhook
-  namespace: cert-manager
+  namespace: "cert-manager"
   labels:
     app: transip-webhook
 ---
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: transip-webhook
-  namespace: cert-manager
-  labels:
-    app: transip-webhook
-rules:
-  - apiGroups:
-      - ''
-    resources:
-      - 'secrets'
-    verbs:
-      - 'get'
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: transip-webhook
-  namespace: cert-manager
-  labels:
-    app: transip-webhook
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: transip-webhook
-subjects:
-  - apiGroup: ""
-    kind: ServiceAccount
-    name: transip-webhook
-    namespace: cert-manager
----
+# Source: transip-webhook/templates/rbac.yaml
 # Grant cert-manager permission to validate using our apiserver
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: transip-webhook:domain-solver
-  namespace: cert-manager
+  namespace: "cert-manager"
   labels:
     app: transip-webhook
 rules:
@@ -55,13 +25,31 @@ rules:
     verbs:
       - 'create'
 ---
+# Source: transip-webhook/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: transip-webhook:flowcontrol-solver
+  labels:
+    app: transip-webhook
+rules:
+  - apiGroups:
+      - "flowcontrol.apiserver.k8s.io"
+    resources:
+      - 'prioritylevelconfigurations'
+      - 'flowschemas'
+    verbs:
+      - 'list'
+      - 'watch'
+---
+# Source: transip-webhook/templates/rbac.yaml
 # apiserver gets the auth-delegator role to delegate auth decisions to
 # the core apiserver
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: transip-webhook:auth-delegator
-  namespace: cert-manager
+  namespace: "cert-manager"
   labels:
     app: transip-webhook
 roleRef:
@@ -74,11 +62,12 @@ subjects:
     name: transip-webhook
     namespace: cert-manager
 ---
+# Source: transip-webhook/templates/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: transip-webhook:domain-solver
-  namespace: cert-manager
+  namespace: "cert-manager"
   labels:
     app: transip-webhook
 roleRef:
@@ -91,6 +80,41 @@ subjects:
     name: cert-manager
     namespace: cert-manager
 ---
+# Source: transip-webhook/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: transip-webhook:flowcontrol-solver
+  labels:
+    app: transip-webhook
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: transip-webhook:flowcontrol-solver
+subjects:
+  - apiGroup: ""
+    kind: ServiceAccount
+    name: transip-webhook
+    namespace: cert-manager
+---
+# Source: transip-webhook/templates/rbac.yaml
+# Grant cert-manager permission to read secrets from cert-manager ns (i.e. to read the api key for transip)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: transip-webhook:transip-auth
+  namespace: "cert-manager"
+  labels:
+    app: transip-webhook
+rules:
+  - apiGroups:
+      - ''
+    resources:
+      - 'secrets'
+    verbs:
+      - 'get'
+---
+# Source: transip-webhook/templates/rbac.yaml
 # Grant the webhook permission to read the ConfigMap containing the Kubernetes
 # apiserver's requestheader-ca-certificate.
 # This ConfigMap is automatically created by the Kubernetes apiserver.
@@ -111,11 +135,30 @@ subjects:
     name: transip-webhook
     namespace: cert-manager
 ---
+# Source: transip-webhook/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: transip-webhook:transip-auth
+  namespace: "cert-manager"
+  labels:
+    app: transip-webhook
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: transip-webhook:transip-auth
+subjects:
+  - apiGroup: ""
+    kind: ServiceAccount
+    name: transip-webhook
+    namespace: cert-manager
+---
+# Source: transip-webhook/templates/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   name: transip-webhook
-  namespace: cert-manager
+  namespace: "cert-manager"
   labels:
     app: transip-webhook
 spec:
@@ -127,28 +170,32 @@ spec:
       name: https
   selector:
     app: transip-webhook
+    release: transip-webhook
 ---
+# Source: transip-webhook/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: transip-webhook
-  namespace: cert-manager
+  namespace: "cert-manager"
   labels:
     app: transip-webhook
 spec:
-  replicas: 1
+  replicas: 
   selector:
     matchLabels:
       app: transip-webhook
+      release: transip-webhook
   template:
     metadata:
       labels:
         app: transip-webhook
+        release: transip-webhook
     spec:
       serviceAccountName: transip-webhook
       containers:
         - name: transip-webhook
-          image: "robbietjuh/cert-manager-webhook-transip:latest"
+          image: "assi010/cert-manager-webhook-transip:1.0"
           imagePullPolicy: IfNotPresent
           args:
             - --tls-cert-file=/tls/tls.crt
@@ -174,16 +221,18 @@ spec:
             - name: certs
               mountPath: /tls
               readOnly: true
+          resources:
+            {}
       volumes:
         - name: certs
           secret:
             secretName: transip-webhook-tls
 ---
+# Source: transip-webhook/templates/apiservice.yaml
 apiVersion: apiregistration.k8s.io/v1
 kind: APIService
 metadata:
   name: v1alpha1.cert-manager.webhook.transip
-  namespace: cert-manager
   labels:
     app: transip-webhook
   annotations:
@@ -194,15 +243,16 @@ spec:
   versionPriority: 15
   service:
     name: transip-webhook
-    namespace: cert-manager
+    namespace: "cert-manager"
   version: v1alpha1
 ---
+# Source: transip-webhook/templates/pki.yaml
 # Generate a CA Certificate used to sign certificates for the webhook
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: transip-webhook-ca
-  namespace: cert-manager
+  namespace: "cert-manager"
   labels:
     app: transip-webhook
 spec:
@@ -213,12 +263,13 @@ spec:
   commonName: "ca.transip-webhook.cert-manager"
   isCA: true
 ---
+# Source: transip-webhook/templates/pki.yaml
 # Finally, generate a serving certificate for the webhook to use
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: transip-webhook-tls
-  namespace: cert-manager
+  namespace: "cert-manager"
   labels:
     app: transip-webhook
 spec:
@@ -227,18 +278,18 @@ spec:
   issuerRef:
     name: transip-webhook-ca
   dnsNames:
-    - transip-webhook
-    - transip-webhook.cert-manager
-    - transip-webhook.cert-manager.svc
-    - transip-webhook.cert-manager.svc.cluster.local
+  - transip-webhook
+  - transip-webhook.cert-manager
+  - transip-webhook.cert-manager.svc
 ---
+# Source: transip-webhook/templates/pki.yaml
 # Create a selfsigned Issuer, in order to create a root CA certificate for
 # signing webhook serving certificates
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: transip-webhook-selfsign
-  namespace: cert-manager
+  namespace: "cert-manager"
   labels:
     app: transip-webhook
 spec:
@@ -250,7 +301,7 @@ apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: transip-webhook-ca
-  namespace: cert-manager
+  namespace: "cert-manager"
   labels:
     app: transip-webhook
 spec:
