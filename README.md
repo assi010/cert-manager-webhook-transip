@@ -7,15 +7,14 @@ This is an implementation of a Cert-Manager webhook for implementing DNS01 acme 
 You can use Helm to deploy the webhook:
 
 ```shell script
-$ git clone https://github.com/assi010/cert-manager-webhook-transip.git
-$ cd cert-manager-webhook-transip
-$ helm install cert-manager-webhook-transip --namespace=cert-manager ./deploy/transip-webhook
+helm repo add transip-webhook https://assi010.github.io/cert-manager-webhook-transip/
+helm install transip-webhook transip-webhook/transip-webhook
 ```
 
 Alternatively, you can use kubectl to deploy:
 
 ```shell script
-$ kubectl -n cert-manager apply -f https://raw.githubusercontent.com/assi010/cert-manager-webhook-transip/master/deploy/recommended.yaml
+kubectl -n cert-manager apply -f https://raw.githubusercontent.com/assi010/cert-manager-webhook-transip/master/deploy/recommended.yaml
 ```
 
 Both methods will simply deploy the webhook container into your Kubernetes environment. After deployment, you'll have to configure the webhook to interface with your TransIP account.
@@ -25,20 +24,22 @@ Both methods will simply deploy the webhook container into your Kubernetes envir
 The webhook needs your TransIP account name and your API private key. The private key must be deployed as a secret.
 
 ```shell script
-# Given your private key is in the file privateKey
-kubectl -n cert-manager create secret generic transip-credentials --from-file=privateKey
+# Given your private key is in the file private.key
+kubectl -n cert-manager create secret generic transip-credentials --from-file=private.key
 ```
 
 After saving your private key as a secret to the cluster, you'll have to configure the Issuer object. You can use the following as a template:
-
 ```yaml
 apiVersion: cert-manager.io/v1
-kind: Issuer
+# Change to ClusterIssuer when used in multiple namespaces
+kind: Issuer 
 metadata:
-  name: le-staging
+  name: letsencrypt-staging
+  namespace: your-desired-namespace
 spec:
   acme:
     email: user@example.com
+    # For production use: https://acme-v02.api.letsencrypt.org/directory
     server: https://acme-staging-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: le-staging-issuer-key
@@ -52,10 +53,28 @@ spec:
             ttl: 300
             privateKeySecretRef:
               name: transip-credentials
-              key: privateKey
+              key: private.key
 ```
 
-That's it! Now you're set up to request your first certificate :-)
+That's it! Now you're set up to request your first certificate!
+You can use the following as an example:
+
+```yaml
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: example-com
+  namespace: your-desired-namespace
+spec:
+  secretName: example-com-secret
+  dnsNames:
+    - example.com
+  issuerRef:
+    name: letsencrypt-staging
+    # We can reference ClusterIssuers by changing the kind here.
+    # The default value is Issuer (i.e. a locally namespaced Issuer)
+    kind: Issuer
+```
 
 ### Running the test suite
 
