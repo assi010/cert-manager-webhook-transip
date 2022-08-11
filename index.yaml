@@ -3,12 +3,12 @@ entries:
   transip-webhook:
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2022-08-11T17:45:06.750684041+03:00"
+    created: "2022-08-11T18:49:36.295284391+03:00"
     description: A Cert-Manager webhook for requesting DNS-01 certs with TransIP as
       the DNS provider
-    digest: fb38485ec4152cabbb89dda6bbc105a850a00172ed40a6c16137c52d00c88b6f
+    digest: 50700a9b50727a82fb11677a0df2a00cb1e747e49f564742e5c6caf7a926e8d5
     name: transip-webhook
     urls:
     - https://assi010.github.io/cert-manager-webhook-transip/transip-webhook-0.1.0.tgz
     version: 0.1.0
-generated: "2022-08-11T17:45:06.750369071+03:00"
+generated: "2022-08-11T18:49:36.294925394+03:00"
