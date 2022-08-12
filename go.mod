@@ -1,4 +1,4 @@
-module github.com/robbietjuh/cert-manager-webhook-transip
+module github.com/assi010/cert-manager-webhook-transip
 
 go 1.18
 
