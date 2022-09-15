@@ -54,22 +54,17 @@ func (c *transipDNSProviderSolver) Name() string {
 }
 
 func (c *transipDNSProviderSolver) NewTransipClient(ch *v1alpha1.ChallengeRequest, cfg *transipDNSProviderConfig) (*repository.Client, error) {
-	privateKey := cfg.PrivateKey
-
-	if len(privateKey) == 0 {
-		secret, err := c.client.CoreV1().Secrets(ch.ResourceNamespace).Get(context.TODO(), cfg.PrivateKeySecretRef.Name, metav1.GetOptions{})
-		if err != nil {
-			return nil, err
-		}
-
-		ok := false
-		privateKey, ok = secret.Data[cfg.PrivateKeySecretRef.Key]
-		if !ok {
-			return nil, fmt.Errorf("no private key for %q in secret '%s/%s'", cfg.PrivateKeySecretRef.Name, cfg.PrivateKeySecretRef.Key, ch.ResourceNamespace)
-		}
+	secret, err := c.client.CoreV1().Secrets(ch.ResourceNamespace).Get(context.TODO(), cfg.PrivateKeySecretRef.Name, metav1.GetOptions{})
+	if err != nil {
+		return nil, err
 	}
 
-	fmt.Printf("creating SOAP client ...\n")
+	privateKey, ok := secret.Data[cfg.PrivateKeySecretRef.Key]
+	if !ok {
+		return nil, fmt.Errorf("no private key for %q in secret '%s/%s'", cfg.PrivateKeySecretRef.Name, cfg.PrivateKeySecretRef.Key, ch.ResourceNamespace)
+	}
+
+	fmt.Printf("creating transip client ...\n")
 
 	client, err := gotransip.NewClient(gotransip.ClientConfiguration{
 		AccountName:      cfg.AccountName,
