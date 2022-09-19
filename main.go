@@ -42,7 +42,6 @@ type transipDNSProviderSolver struct {
 
 type transipDNSProviderConfig struct {
 	AccountName         string               `json:"accountName"`
-	PrivateKey          []byte               `json:"privateKey"`
 	PrivateKeySecretRef v1.SecretKeySelector `json:"privateKeySecretRef"`
 	TTL                 int                  `json:"ttl"`
 }

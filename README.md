@@ -81,5 +81,5 @@ spec:
 Please start out by configuring your environment in `testdata/transip/config.json`. You can then run the test suite with:
 
 ```bash
-$ TEST_ZONE_NAME=example.com make test
+$ TEST_ZONE_NAME=example.com. make test
 ```

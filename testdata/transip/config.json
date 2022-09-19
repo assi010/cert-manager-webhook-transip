@@ -1,5 +1,8 @@
 {
   "accountName": "username",
-  "privateKey": "base64-encoded private key",
+  "privateKeySecretRef": {
+    "name": "transip-credentials",
+    "key": "private.key"
+  },
   "ttl": 300
 }
