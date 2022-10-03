@@ -197,7 +197,7 @@ spec:
       serviceAccountName: transip-webhook
       containers:
         - name: transip-webhook
-          image: "assi010/cert-manager-webhook-transip:1.0"
+          image: "assi010/cert-manager-webhook-transip:1.1"
           imagePullPolicy: IfNotPresent
           args:
             - --tls-cert-file=/tls/tls.crt
