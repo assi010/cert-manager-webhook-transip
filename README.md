@@ -51,9 +51,15 @@ spec:
           config:
             accountName: your-transip-username
             ttl: 300
+            # When using the private key as secret in k8s
             privateKeySecretRef:
               name: transip-credentials
               key: private.key
+            # When using managed identities and the Azure KeyVault
+            # keyManager:
+            #   providerName: "AzureKeyVault"
+            #   vaultUrl: "https://my-azure-keyvault-url",
+            #   keyName: "name of key in Azure KeyVault"
 ```
 
 That's it! Now you're set up to request your first certificate!

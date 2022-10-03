@@ -5,21 +5,22 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/assi010/cert-manager-webhook-transip/keymanagers"
+	"github.com/assi010/gotransip/v6"
+	"github.com/assi010/gotransip/v6/authenticator"
+	"github.com/assi010/gotransip/v6/domain"
+	"github.com/assi010/gotransip/v6/repository"
+	"github.com/cert-manager/cert-manager/pkg/acme/webhook/apis/acme/v1alpha1"
+	"github.com/cert-manager/cert-manager/pkg/acme/webhook/cmd"
 	"github.com/cert-manager/cert-manager/pkg/issuer/acme/dns/util"
-	"os"
-	"strings"
-
+	"io"
 	v1 "k8s.io/api/core/v1"
 	extapi "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-
-	"github.com/cert-manager/cert-manager/pkg/acme/webhook/apis/acme/v1alpha1"
-	"github.com/cert-manager/cert-manager/pkg/acme/webhook/cmd"
-	"github.com/transip/gotransip/v6"
-	"github.com/transip/gotransip/v6/domain"
-	"github.com/transip/gotransip/v6/repository"
+	"os"
+	"strings"
 )
 
 var GroupName = os.Getenv("GROUP_NAME")
@@ -41,9 +42,10 @@ type transipDNSProviderSolver struct {
 }
 
 type transipDNSProviderConfig struct {
-	AccountName         string               `json:"accountName"`
-	PrivateKeySecretRef v1.SecretKeySelector `json:"privateKeySecretRef"`
-	TTL                 int                  `json:"ttl"`
+	AccountName         string                       `json:"accountName"`
+	PrivateKeySecretRef v1.SecretKeySelector         `json:"privateKeySecretRef"`
+	TTL                 int                          `json:"ttl"`
+	KeyManager          keymanagers.KeyManagerConfig `json:"keyManager"`
 }
 
 // Name is used as the name for this DNS solver when referencing it on the ACME
@@ -53,21 +55,37 @@ func (c *transipDNSProviderSolver) Name() string {
 }
 
 func (c *transipDNSProviderSolver) NewTransipClient(ch *v1alpha1.ChallengeRequest, cfg *transipDNSProviderConfig) (*repository.Client, error) {
-	secret, err := c.client.CoreV1().Secrets(ch.ResourceNamespace).Get(context.TODO(), cfg.PrivateKeySecretRef.Name, metav1.GetOptions{})
-	if err != nil {
-		return nil, err
+	var signingProvider authenticator.KeyManager
+	var privateKeyReader io.Reader
+
+	if cfg.KeyManager.ProviderName != "" {
+		var err error
+		signingProvider, err = keymanagers.GetProvider(cfg.KeyManager)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	privateKey, ok := secret.Data[cfg.PrivateKeySecretRef.Key]
-	if !ok {
-		return nil, fmt.Errorf("no private key for %q in secret '%s/%s'", cfg.PrivateKeySecretRef.Name, cfg.PrivateKeySecretRef.Key, ch.ResourceNamespace)
+	if cfg.PrivateKeySecretRef.Name != "" {
+		secret, err := c.client.CoreV1().Secrets(ch.ResourceNamespace).Get(context.TODO(), cfg.PrivateKeySecretRef.Name, metav1.GetOptions{})
+		if err != nil {
+			return nil, err
+		}
+
+		privateKey, ok := secret.Data[cfg.PrivateKeySecretRef.Key]
+		if !ok && signingProvider == nil {
+			return nil, fmt.Errorf("no private key for %q in secret '%s/%s'", cfg.PrivateKeySecretRef.Name, cfg.PrivateKeySecretRef.Key, ch.ResourceNamespace)
+		}
+
+		privateKeyReader = bytes.NewReader(privateKey)
 	}
 
 	fmt.Printf("creating transip client ...\n")
 
 	client, err := gotransip.NewClient(gotransip.ClientConfiguration{
 		AccountName:      cfg.AccountName,
-		PrivateKeyReader: bytes.NewReader(privateKey),
+		PrivateKeyReader: privateKeyReader,
+		KeyManager:       signingProvider,
 	})
 	if err != nil {
 		return nil, err
@@ -98,7 +116,7 @@ func (c *transipDNSProviderSolver) Present(ch *v1alpha1.ChallengeRequest) error 
 
 	client, err := c.NewTransipClient(ch, cfg)
 	if err != nil {
-		fmt.Printf("Error while creating SOAP client: %s\n", err)
+		fmt.Printf("Error while creating transip client: %s\n", err)
 		return err
 	}
 
@@ -181,7 +199,7 @@ func (c *transipDNSProviderSolver) CleanUp(ch *v1alpha1.ChallengeRequest) error 
 }
 
 // Initialize will be called when the webhook first starts.
-func (c *transipDNSProviderSolver) Initialize(kubeClientConfig *rest.Config, stopCh <-chan struct{}) error {
+func (c *transipDNSProviderSolver) Initialize(kubeClientConfig *rest.Config, _ <-chan struct{}) error {
 	cl, err := kubernetes.NewForConfig(kubeClientConfig)
 	if err != nil {
 		return err
