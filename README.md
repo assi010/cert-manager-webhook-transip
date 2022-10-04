@@ -21,9 +21,9 @@ Both methods will simply deploy the webhook container into your Kubernetes envir
 
 ### Configuration
 
-_This part can be skipped when using the Azure KeyVault to sign api requests._
-
 The webhook needs your TransIP account name and your API private key. The private key must be deployed as a secret.
+
+_This command can be skipped when using the Azure KeyVault to sign api requests._
 
 ```shell script
 # Given your private key is in the file private.key
