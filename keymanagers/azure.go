@@ -6,7 +6,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
-	"github.com/Azure/azure-sdk-for-go/sdk/keyvault/azkeys"
+	"github.com/Azure/azure-sdk-for-go/sdk/security/keyvault/azkeys"
 )
 
 const (
@@ -17,7 +17,7 @@ type AzureKeyVaultProvider struct {
 	configuration *KeyManagerConfig
 }
 
-func (a AzureKeyVaultProvider) SignExternally(body []byte) (string, error) {
+func (a AzureKeyVaultProvider) Sign(body []byte) (string, error) {
 	keyName := a.configuration.KeyName
 	vaultUrl := a.configuration.VaultUrl
 
@@ -30,10 +30,13 @@ func (a AzureKeyVaultProvider) SignExternally(body []byte) (string, error) {
 		return "", fmt.Errorf("failed to obtain a credential: %v", err)
 	}
 
-	client := azkeys.NewClient(vaultUrl, cred, nil)
-	version := ""
-	algorithm := azkeys.JSONWebKeySignatureAlgorithmRS512
+	client, err := azkeys.NewClient(vaultUrl, cred, nil)
+	if err != nil {
+		return "", err
+	}
 
+	version := ""
+	algorithm := azkeys.SignatureAlgorithmRS512
 	digest := sha512.Sum512(body)
 	signParameters := azkeys.SignParameters{
 		Algorithm: &algorithm,

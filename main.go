@@ -233,7 +233,7 @@ func extractRecordName(fqdn, domain string) string {
 }
 
 func extractDomainName(zone string) string {
-	authZone, err := util.FindZoneByFqdn(zone, util.RecursiveNameservers)
+	authZone, err := util.FindZoneByFqdn(context.TODO(), zone, util.RecursiveNameservers)
 	if err != nil {
 		fmt.Printf("could not get zone by fqdn %v", err)
 		return zone
