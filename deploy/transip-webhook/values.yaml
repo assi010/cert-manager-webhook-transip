@@ -5,8 +5,8 @@ certManager:
   serviceAccountName: cert-manager
 
 image:
-  repository: assi010/cert-manager-webhook-transip
-  tag: "1.1"
+  repository: ghcr.io/assi010/cert-manager-webhook-transip
+  tag: "v1.1.1"
   privateRegistrySecretName: ""
   pullPolicy: IfNotPresent
 

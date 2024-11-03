@@ -183,7 +183,7 @@ metadata:
   labels:
     app: transip-webhook
 spec:
-  replicas: 
+  replicas: 1
   selector:
     matchLabels:
       app: transip-webhook
@@ -197,7 +197,7 @@ spec:
       serviceAccountName: transip-webhook
       containers:
         - name: transip-webhook
-          image: "assi010/cert-manager-webhook-transip:1.1"
+          image: "ghcr.io/assi010/cert-manager-webhook-transip:v1.1.1"
           imagePullPolicy: IfNotPresent
           args:
             - --tls-cert-file=/tls/tls.crt
