@@ -86,7 +86,7 @@ spec:
 
 ### Running the test suite
 
-Please start out by configuring your environment in `testdata/transip/config.json`. You can then run the test suite with:
+Please start out by configuring your username in `testdata/transip/config.json` and private key in `testdata/transip/secret.yaml`. You can then run the test suite with:
 
 ```bash
 $ TEST_ZONE_NAME=example.com. make test

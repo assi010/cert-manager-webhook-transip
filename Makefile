@@ -1,12 +1,12 @@
 OS ?= $(shell go env GOOS)
 ARCH ?= $(shell go env GOARCH)
 
-IMAGE_NAME := "assi010/cert-manager-webhook-transip"
-IMAGE_TAG := "1.0"
+IMAGE_NAME := "ghcr.io/assi010/cert-manager-webhook-transip"
+IMAGE_TAG := "v1.1.1"
 
 OUT := $(shell pwd)/_out
 
-KUBE_VERSION=1.30.3
+KUBE_VERSION=1.30.0
 
 $(shell mkdir -p "$(OUT)")
 export TEST_ASSET_ETCD=_test/kubebuilder/bin/etcd
