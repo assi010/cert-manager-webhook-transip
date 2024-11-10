@@ -30,6 +30,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
+            - --secure-port=8443
             - --tls-cert-file=/tls/tls.crt
             - --tls-private-key-file=/tls/tls.key
           env:
@@ -37,7 +38,7 @@ spec:
               value: {{ .Values.groupName | quote }}
           ports:
             - name: https
-              containerPort: 443
+              containerPort: 8443
               protocol: TCP
           livenessProbe:
             httpGet:
@@ -53,6 +54,16 @@ spec:
             - name: certs
               mountPath: /tls
               readOnly: true
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
+            privileged: false
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
           resources:
 {{ toYaml .Values.resources | indent 12 }}
       volumes:

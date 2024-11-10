@@ -197,9 +197,10 @@ spec:
       serviceAccountName: transip-webhook
       containers:
         - name: transip-webhook
-          image: "ghcr.io/assi010/cert-manager-webhook-transip:v1.1.1"
+          image: "ghcr.io/assi010/cert-manager-webhook-transip:v1.1.2"
           imagePullPolicy: IfNotPresent
           args:
+            - --secure-port=8443
             - --tls-cert-file=/tls/tls.crt
             - --tls-private-key-file=/tls/tls.key
           env:
@@ -207,7 +208,7 @@ spec:
               value: "cert-manager.webhook.transip"
           ports:
             - name: https
-              containerPort: 443
+              containerPort: 8443
               protocol: TCP
           livenessProbe:
             httpGet:
@@ -223,6 +224,16 @@ spec:
             - name: certs
               mountPath: /tls
               readOnly: true
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
+            privileged: false
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
           resources:
             {}
       volumes:
