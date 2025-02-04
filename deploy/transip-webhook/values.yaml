@@ -17,6 +17,9 @@ service:
   type: ClusterIP
   port: 443
 
+serviceAccount:
+  annotations:
+
 resources: {}
   # limits:
   #  cpu: 100m

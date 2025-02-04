@@ -3,6 +3,9 @@ kind: ServiceAccount
 metadata:
   name: {{ include "transip-webhook.fullname" . }}
   namespace: {{ .Values.certManager.namespace | quote }}
+{{- if not (empty .Values.serviceAccount.annotations) }}
+  annotations: {{ toYaml .Values.serviceAccount.annotations | nindent 4 }}
+{{- end }}
   labels:
     app: {{ include "transip-webhook.name" . }}
     chart: {{ include "transip-webhook.chart" . }}
