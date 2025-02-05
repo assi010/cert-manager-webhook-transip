@@ -19,6 +19,9 @@ spec:
       labels:
         app: {{ include "transip-webhook.name" . }}
         release: {{ .Release.Name }}
+{{- if not (empty .Values.pod.labels) }}
+{{ toYaml .Values.pod.labels | indent 8 }}
+{{- end }}
     spec:
       {{- if .Values.image.privateRegistrySecretName }}
       imagePullSecrets:

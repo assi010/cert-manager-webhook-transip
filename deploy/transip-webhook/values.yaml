@@ -20,6 +20,9 @@ service:
 serviceAccount:
   annotations:
 
+pod:
+  labels:
+
 resources: {}
   # limits:
   #  cpu: 100m
