@@ -11,7 +11,7 @@ COPY go.sum .
 RUN go mod download
 
 FROM build_deps AS build
-ARG TARGETPLATFORM="x86_64"
+ARG TARGETPLATFORM
 
 COPY . .
 
