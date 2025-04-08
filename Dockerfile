@@ -14,15 +14,14 @@ FROM build_deps AS build
 ARG TARGETPLATFORM
 
 RUN export ARCH=$(case ${TARGETPLATFORM:-linux/amd64} in \
-    "linux/amd64")   echo "x86_64"  ;; \
-    "linux/arm/v7")  echo "armhf"   ;; \
-    "linux/arm64")   echo "aarch64" ;; \
+    "linux/amd64")   echo "amd64"  ;; \
+    "linux/arm64")   echo "arm64" ;; \
     *)               echo ""        ;; esac) \
   && echo "$ARCH"
 
 COPY . .
 
-RUN GOOS=darwin GOARCH=$ARCH CGO_ENABLED=0 go build -o webhook -ldflags '-w -extldflags "-static"' .
+RUN GOOS=linux GOARCH=$ARCH CGO_ENABLED=0 go build -o webhook -ldflags '-w -extldflags "-static"' .
 
 FROM alpine:3.20.3
 
