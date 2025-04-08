@@ -11,12 +11,11 @@ COPY go.sum .
 RUN go mod download
 
 FROM build_deps AS build
-ARG TARGETPLATFORM
-ARG TARGETARCH
-
-RUN echo "Building for platform: ${TARGETPLATFORM}, architecture: ${TARGETARCH}"
 
 COPY . .
+
+ARG TARGETPLATFORM
+ARG TARGETARCH
 
 RUN GOOS=linux GOARCH=${TARGETARCH} CGO_ENABLED=0 go build -o webhook -ldflags '-w -extldflags "-static"' .
 
