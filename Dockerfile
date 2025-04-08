@@ -12,16 +12,13 @@ RUN go mod download
 
 FROM build_deps AS build
 ARG TARGETPLATFORM
+ARG TARGETARCH
 
-RUN export ARCH=$(case ${TARGETPLATFORM:-linux/amd64} in \
-    "linux/amd64")   echo "amd64"  ;; \
-    "linux/arm64")   echo "arm64" ;; \
-    *)               echo ""        ;; esac) \
-  && echo "$ARCH"
+RUN echo "Building for platform: ${TARGETPLATFORM}, architecture: ${TARGETARCH}"
 
 COPY . .
 
-RUN GOOS=linux GOARCH=$ARCH CGO_ENABLED=0 go build -o webhook -ldflags '-w -extldflags "-static"' .
+RUN GOOS=linux GOARCH=${TARGETARCH} CGO_ENABLED=0 go build -o webhook -ldflags '-w -extldflags "-static"' .
 
 FROM alpine:3.20.3
 
