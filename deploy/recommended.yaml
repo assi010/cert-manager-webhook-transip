@@ -197,7 +197,7 @@ spec:
       serviceAccountName: transip-webhook
       containers:
         - name: transip-webhook
-          image: "ghcr.io/assi010/cert-manager-webhook-transip:v1.1.2"
+          image: "ghcr.io/assi010/cert-manager-webhook-transip:v1.1.3"
           imagePullPolicy: IfNotPresent
           args:
             - --secure-port=8443
