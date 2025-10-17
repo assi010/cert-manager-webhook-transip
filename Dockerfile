@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM golang:1.24.4-alpine AS build_deps
+FROM --platform=$BUILDPLATFORM golang:1.25.3-alpine AS build_deps
 
 RUN apk add --no-cache git
 
@@ -19,7 +19,7 @@ ARG TARGETARCH
 
 RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} CGO_ENABLED=0 go build -o webhook -ldflags '-w -extldflags "-static"' .
 
-FROM alpine:3.22.0
+FROM alpine:3.22.2
 
 # UID of the non-root user 'app'
 ENV APP_UID=1654
