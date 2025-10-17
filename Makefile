@@ -12,7 +12,6 @@ $(shell mkdir -p "$(OUT)")
 export TEST_ASSET_ETCD=_test/envtest/bin/etcd
 export TEST_ASSET_KUBE_APISERVER=_test/envtest/bin/kube-apiserver
 export TEST_ASSET_KUBECTL=_test/envtest/bin/kubectl
-export TEST_ZONE_NAME=example.com.
 
 test: _test/envtest
 	go test -v .
