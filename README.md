@@ -2,6 +2,26 @@
 
 This is an implementation of a Cert-Manager webhook for implementing DNS01 acme verification with TransIP as a DNS provider.
 
+[![Cert-Manager](https://img.shields.io/badge/Cert_manager-1.19.1-brightgreen)](https://cert-manager.io/docs/)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-1.34.1-brightgreen)](https://kubernetes.io/docs/home/)
+![Linux amd64](https://img.shields.io/badge/Linux-amd64-blue)
+![Linux arm64](https://img.shields.io/badge/Linux-arm64-blue)
+
+### Supported kubernetes versions
+
+| Kubernetes | Supported | Tested | Notes                                          |
+|------------|-----------|--------|------------------------------------------------|
+| v1.31      | ✅         | ✅      |                                                |
+| v1.32      | ✅         | ✅      |                                                |
+| v1.33      | ✅         | ✅      |                                                |
+| v1.34      | ✅         | ✅      | Cert-Manager supports k8s v1.34 starting v1.19 |
+
+
+### Notes
+⚠️ This webhook uses a [modified](https://github.com/assi010/gotransip) version of the gotransip package to support signing requests using an external KMS (e.g. Azure keyvault).\
+🔒 This webhook is able to run in a [restricted](https://kubernetes.io/docs/concepts/security/pod-security-standards/) namespace as it runs rootless, with a read-only filesystem, and all Linux capabilities dropped for maximum security.\
+🌐 In case you run a split-brain DNS setup for your domain, do not forget to configure the [recursive nameservers](https://cert-manager.io/docs/configuration/acme/dns01/#setting-nameservers-for-dns01-self-check) in cert-manager.
+
 ### Installation
 
 You can use Helm to deploy the webhook:
