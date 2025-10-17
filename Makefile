@@ -6,28 +6,29 @@ IMAGE_TAG := "v1.1.2"
 
 OUT := $(shell pwd)/_out
 
-KUBE_VERSION=1.30.0
+KUBE_VERSION=1.34.1
 
 $(shell mkdir -p "$(OUT)")
-export TEST_ASSET_ETCD=_test/kubebuilder/bin/etcd
-export TEST_ASSET_KUBE_APISERVER=_test/kubebuilder/bin/kube-apiserver
-export TEST_ASSET_KUBECTL=_test/kubebuilder/bin/kubectl
+export TEST_ASSET_ETCD=_test/envtest/bin/etcd
+export TEST_ASSET_KUBE_APISERVER=_test/envtest/bin/kube-apiserver
+export TEST_ASSET_KUBECTL=_test/envtest/bin/kubectl
+export TEST_ZONE_NAME=example.com.
 
-test: _test/kubebuilder
+test: _test/envtest
 	go test -v .
 
-_test/kubebuilder:
-	curl -fsSL https://go.kubebuilder.io/test-tools/$(KUBE_VERSION)/$(OS)/$(ARCH) -o kubebuilder-tools.tar.gz
-	mkdir -p _test/kubebuilder
-	tar -xvf kubebuilder-tools.tar.gz
-	mv kubebuilder/bin _test/kubebuilder/
-	rm kubebuilder-tools.tar.gz
-	rm -R kubebuilder
+_test/envtest:
+	curl -fsSL https://github.com/kubernetes-sigs/controller-tools/releases/download/envtest-v$(KUBE_VERSION)/envtest-v$(KUBE_VERSION)-$(OS)-$(ARCH).tar.gz -o envtest.tar.gz
+	mkdir -p _test/envtest
+	tar -xvf envtest.tar.gz
+	mv controller-tools/envtest _test/envtest/bin
+	rm envtest.tar.gz
+	rm -R controller-tools
 
-clean: clean-kubebuilder
+clean: clean-envtest
 
-clean-kubebuilder:
-	rm -Rf _test/kubebuilder
+clean-envtest:
+	rm -Rf _test/envtest
 
 build:
 	docker build -t "$(IMAGE_NAME):$(IMAGE_TAG)" .
