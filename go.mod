@@ -5,7 +5,7 @@ go 1.25.3
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.13.0
 	github.com/Azure/azure-sdk-for-go/sdk/security/keyvault/azkeys v1.4.0
-	github.com/assi010/gotransip/v6 v6.26.0
+	github.com/assi010/gotransip/v6 v6.26.1
 	github.com/cert-manager/cert-manager v1.19.1
 	k8s.io/api v0.34.1
 	k8s.io/apiextensions-apiserver v0.34.1
