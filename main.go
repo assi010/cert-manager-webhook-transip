@@ -5,6 +5,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"os"
+	"strings"
+
 	"github.com/assi010/cert-manager-webhook-transip/keymanagers"
 	"github.com/assi010/gotransip/v6"
 	"github.com/assi010/gotransip/v6/authenticator"
@@ -13,14 +17,12 @@ import (
 	"github.com/cert-manager/cert-manager/pkg/acme/webhook/apis/acme/v1alpha1"
 	"github.com/cert-manager/cert-manager/pkg/acme/webhook/cmd"
 	"github.com/cert-manager/cert-manager/pkg/issuer/acme/dns/util"
-	"io"
+	"golang.org/x/net/publicsuffix"
 	v1 "k8s.io/api/core/v1"
 	extapi "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	"os"
-	"strings"
 )
 
 var GroupName = os.Getenv("GROUP_NAME")
@@ -226,17 +228,25 @@ func loadConfig(cfgJSON *extapi.JSON) (*transipDNSProviderConfig, error) {
 }
 
 func extractRecordName(fqdn, domain string) string {
-	if idx := strings.Index(fqdn, "."+domain); idx != -1 {
-		return fqdn[:idx]
+	cleanFqdn := util.UnFqdn(fqdn)
+	if idx := strings.Index(cleanFqdn, "."+domain); idx != -1 {
+		return cleanFqdn[:idx]
 	}
-	return util.UnFqdn(fqdn)
+	return cleanFqdn
 }
 
 func extractDomainName(zone string) string {
+	cleanZone := util.UnFqdn(zone)
+
+	baseDomain, err := publicsuffix.EffectiveTLDPlusOne(cleanZone)
+	if err == nil && baseDomain != "" {
+		return baseDomain
+	}
+
 	authZone, err := util.FindZoneByFqdn(context.TODO(), zone, util.RecursiveNameservers)
 	if err != nil {
-		fmt.Printf("could not get zone by fqdn %v", err)
-		return zone
+		fmt.Printf("could not determine authoritative zone for %s: %v", cleanZone, err)
+		return cleanZone
 	}
 	return util.UnFqdn(authZone)
 }

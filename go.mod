@@ -7,6 +7,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/security/keyvault/azkeys v1.4.0
 	github.com/assi010/gotransip/v6 v6.25.0
 	github.com/cert-manager/cert-manager v1.18.0
+	golang.org/x/net v0.41.0
 	k8s.io/api v0.32.5
 	k8s.io/apiextensions-apiserver v0.32.5
 	k8s.io/apimachinery v0.32.5
