@@ -2,8 +2,8 @@
 
 This is an implementation of a Cert-Manager webhook for implementing DNS01 acme verification with TransIP as a DNS provider.
 
-[![Cert-Manager](https://img.shields.io/badge/Cert_manager-1.20.0-brightgreen)](https://cert-manager.io/docs/)
-[![Kubernetes](https://img.shields.io/badge/Kubernetes-1.35.0-brightgreen)](https://kubernetes.io/docs/home/)
+[![Cert-Manager](https://img.shields.io/badge/Cert_manager-1.21.0-brightgreen)](https://cert-manager.io/docs/)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-1.36.0-brightgreen)](https://kubernetes.io/docs/home/)
 ![Linux amd64](https://img.shields.io/badge/Linux-amd64-blue)
 ![Linux arm64](https://img.shields.io/badge/Linux-arm64-blue)
 
@@ -11,10 +11,10 @@ This is an implementation of a Cert-Manager webhook for implementing DNS01 acme 
 
 | Kubernetes | Supported | Tested | Notes                                          |
 |------------|-----------|--------|------------------------------------------------|
-| v1.32      | ✅         | ✅      |                                                |
-| v1.33      | ✅         | ✅      |                                                |
-| v1.34      | ✅         | ✅      | Cert-Manager supports k8s v1.34 starting v1.19 |
-| v1.35      | ✅         | ✅      |                                                |
+| v1.33      | ✅        | ✅     |                                                |
+| v1.34      | ✅        | ✅     | Cert-Manager supports k8s v1.34 starting v1.19 |
+| v1.35      | ✅        | ✅     |                                                |
+| v1.36      | ✅        | ✅     | Cert-Manager supports k8s v1.36 starting v1.21 |
 
 
 ### Notes
