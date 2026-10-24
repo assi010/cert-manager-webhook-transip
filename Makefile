@@ -2,7 +2,7 @@ OS ?= $(shell go env GOOS)
 ARCH ?= $(shell go env GOARCH)
 
 IMAGE_NAME := "ghcr.io/assi010/cert-manager-webhook-transip"
-IMAGE_TAG := "v1.1.5"
+IMAGE_TAG := "v1.1.6"
 
 OUT := $(shell pwd)/_out
 
