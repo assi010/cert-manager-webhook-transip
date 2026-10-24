@@ -2,7 +2,7 @@
 
 This is an implementation of a Cert-Manager webhook for implementing DNS01 acme verification with TransIP as a DNS provider.
 
-[![Cert-Manager](https://img.shields.io/badge/Cert_manager-1.21.0-brightgreen)](https://cert-manager.io/docs/)
+[![Cert-Manager](https://img.shields.io/badge/Cert_manager-1.21.3-brightgreen)](https://cert-manager.io/docs/)
 [![Kubernetes](https://img.shields.io/badge/Kubernetes-1.36.0-brightgreen)](https://kubernetes.io/docs/home/)
 ![Linux amd64](https://img.shields.io/badge/Linux-amd64-blue)
 ![Linux arm64](https://img.shields.io/badge/Linux-arm64-blue)
