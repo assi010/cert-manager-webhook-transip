@@ -2,14 +2,24 @@ apiVersion: v1
 entries:
   transip-webhook:
   - apiVersion: v1
+    appVersion: v1.1.6
+    created: "2026-10-24T13:04:23.434663201+03:00"
+    description: A Cert-Manager webhook for requesting DNS-01 certs with TransIP as
+      the DNS provider
+    digest: 56bfe8fa47e9e7173c0a44dc47d500f6675c529de7ba4d001008b2385a3ab045
+    name: transip-webhook
+    urls:
+    - transip-webhook-0.1.9.tgz
+    version: 0.1.9
+  - apiVersion: v1
     appVersion: v1.1.5
-    created: "2026-07-18T15:14:08.203298439+03:00"
+    created: "2026-10-24T13:04:23.434363909+03:00"
     description: A Cert-Manager webhook for requesting DNS-01 certs with TransIP as
       the DNS provider
     digest: 7fc5761be273c23de04ba023a80175714f10cd27e3bbe71ad21e3b579f94bf5d
     name: transip-webhook
     urls:
-      - transip-webhook-0.1.8.tgz
+    - transip-webhook-0.1.8.tgz
     version: 0.1.8
   - apiVersion: v1
     appVersion: v1.1.4
@@ -91,4 +101,4 @@ entries:
     urls:
     - transip-webhook-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-21T17:46:46.70989618+02:00"
+generated: "2026-10-24T13:04:23.431829738+03:00"
